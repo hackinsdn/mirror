@@ -37,7 +37,7 @@ class MongoController:
         """Get mirror by id."""
         return self.db.mirrors.find_one({"_id": mirror_id}) or {}
 
-    def get_mirrors(self, filters: Dict) -> Dict:
+    def get_mirrors(self, filters: Dict = {}) -> Dict:
         """Get all mirrors."""
         return self.mirrors.find(projection={'_id': False})
 
