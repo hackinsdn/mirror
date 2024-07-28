@@ -1,0 +1,11 @@
+{
+  "author": "HackInSDN team",
+  "username": "hackinsdn",
+  "name": "mirror",
+  "description": "HackInSDN - Traffic Mirror Napp",
+  "version": "1.0",
+  "napp_dependencies": [],
+  "license": "MIT",
+  "tags": [],
+  "url": "https://hackinsdn.ufba.br"
+}

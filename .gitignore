@@ -1,0 +1,9 @@
+.swp
+.pyc
+.napp
+
+__pycache__
+.tox
+.vscode
+*.egg-info
+.coverage
