@@ -39,7 +39,7 @@ class MongoController:
 
     def get_mirrors(self, filters: Dict = {}) -> Dict:
         """Get all mirrors."""
-        return self.mirrors.find(projection={'_id': False})
+        return self.db.mirrors.find(projection={'_id': False})
 
     def upsert_mirror(self, mirror_id: str, mirror: Dict) -> Optional[Dict]:
         """Update or insert an EVC"""
