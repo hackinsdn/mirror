@@ -290,7 +290,7 @@ class Main(KytosNApp):
                 payload = json.dumps(flow_to_send)
                 flow_response = requests.post(flow_NApp_url, headers=headers, data=payload).json()
 
-                self.mirrors["mirrors"][mirror_id]["status"] = new_status
+                self.mirrors[mirror_id]["status"] = new_status
                 self.mongo_controller.upsert_mirror(
                     mirror_id, self.mirrors[mirror_id]
                 )
