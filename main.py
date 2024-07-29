@@ -131,8 +131,6 @@ class Main(KytosNApp):
                     "mirror_flow": new_flow
                 }
 
-                self.enabled_mirrors.append(mirror_id)
-
                 self.mongo_controller.upsert_mirror(
                     mirror_id, self.mirrors[mirror_id]
                 )
@@ -202,8 +200,6 @@ class Main(KytosNApp):
                     "mirror_flow": new_flow
                 }
 
-                self.enabled_mirrors.append(mirror_id)
-
                 self.mongo_controller.upsert_mirror(
                     mirror_id, self.mirrors[mirror_id]
                 )
@@ -239,7 +235,7 @@ class Main(KytosNApp):
     def list_enabled_mirrors(self, request: Request) -> JSONResponse:
         """Returns a json with all the enabled mirrors."""
         return JSONResponse(
-            {id: self.mirrors[id] for id in self.enabled_mirrors}
+            {k: v for k, v in self.mirrors.items() if v["status"] == "Enabled"}
         )
 
     @rest('/v1/all', methods=['GET'])
@@ -276,12 +272,10 @@ class Main(KytosNApp):
                 if status_request == False and current_status == "Enabled":
                     flow_to_send = self.mirrors[mirror_id]["original_flow"]
                     new_status = "Disabled"
-                    self.enabled_mirrors.remove(mirror_id)
 
                 elif status_request == True and current_status == "Disabled":
                     flow_to_send = self.mirrors[mirror_id]["mirror_flow"]
                     new_status = "Enabled"
-                    self.enabled_mirrors.append(mirror_id)
 
                 else:
                     raise HTTPException(400, "Invalid request - nothing to do")
@@ -290,6 +284,9 @@ class Main(KytosNApp):
                 flow_response = requests.post(flow_NApp_url, headers=headers, data=payload).json()
 
                 self.mirrors["mirrors"][mirror_id]["status"] = new_status
+                self.mongo_controller.upsert_mirror(
+                    mirror_id, self.mirrors[mirror_id]
+                )
 
                 return JSONResponse(f"{new_status} mirror: {mirror_id}")
 
