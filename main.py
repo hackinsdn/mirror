@@ -107,6 +107,7 @@ class Main(KytosNApp):
                             flow.pop(extraneous_key,None)
 
                         original_flow['flows'].append(copy.deepcopy(flow))
+                        flow["instructions"][0]["actions"].append({"action_type": "pop_vlan"})
                         flow["instructions"][0]["actions"].append({"action_type": "output", "port": target_port})
                         new_flow['flows'].append(flow)
 
@@ -134,7 +135,7 @@ class Main(KytosNApp):
                     mirror_id, self.mirrors[mirror_id]
                 )
 
-                return JSONResponse(f"Mirror created: {mirror_id}")
+                return JSONResponse({"mirror_id": mirror_id})
 
             else:
                 raise HTTPException(400, f"Switch not found: {switch}")
@@ -203,7 +204,7 @@ class Main(KytosNApp):
                     mirror_id, self.mirrors[mirror_id]
                 )
 
-                return JSONResponse(f"Mirror created: {mirror_id}")
+                return JSONResponse({"mirror_id": mirror_id})
             else:
                 raise HTTPException(400, f"Interface not found: {interface}")
 
