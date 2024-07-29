@@ -238,7 +238,9 @@ class Main(KytosNApp):
     @rest('/v1/', methods=['GET'])
     def list_enabled_mirrors(self, request: Request) -> JSONResponse:
         """Returns a json with all the enabled mirrors."""
-        return JSONResponse({self.mirrors[id] for id in self.enabled_mirrors})
+        return JSONResponse(
+            {id: self.mirrors[id] for id in self.enabled_mirrors}
+        )
 
     @rest('/v1/all', methods=['GET'])
     def list_all_mirrors(self, request: Request) -> JSONResponse:
