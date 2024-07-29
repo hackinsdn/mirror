@@ -60,6 +60,7 @@ class MongoController:
         mirror_dict["original_flow"] = json.dumps(mirror["original_flow"])
         mirror_dict["mirror_flow"] = json.dumps(mirror["mirror_flow"])
         mirror_dict["updated_at"] = utc_now
+        mirror_dict.pop("inserted_at", None)
         updated = self.db.mirrors.find_one_and_update(
             {"_id": mirror_id},
             {
