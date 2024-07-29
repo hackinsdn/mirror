@@ -2,6 +2,7 @@
 
 # pylint: disable=unnecessary-lambda,invalid-name
 import os
+import json
 from datetime import datetime
 from typing import Dict, Optional
 
@@ -35,15 +36,29 @@ class MongoController:
 
     def get_mirror(self, mirror_id: str) -> Dict:
         """Get mirror by id."""
-        return self.db.mirrors.find_one({"_id": mirror_id}) or {}
+        mirror = self.db.mirrors.find_one({"_id": mirror_id})
+        if not mirror:
+            return {}
+        mirror["original_flow"] = json.loads(mirror["original_flow"])
+        mirror["mirror_flow"] = json.loads(mirror["mirror_flow"])
+        return mirror
 
     def get_mirrors(self, filters: Dict = {}) -> Dict:
         """Get all mirrors."""
-        return self.db.mirrors.find(projection={'_id': False})
+        mirrors = {}
+        for mirror in self.db.mirrors.find():
+            mirrors[mirror["_id"]] = mirror
+            mirror["original_flow"] = json.loads(mirror["original_flow"])
+            mirror["mirror_flow"] = json.loads(mirror["mirror_flow"])
+        return mirrors
+
 
     def upsert_mirror(self, mirror_id: str, mirror: Dict) -> Optional[Dict]:
         """Update or insert an EVC"""
         utc_now = datetime.utcnow()
+        mirror_dict = mirror | {"updated_at": utc_now}
+        mirror_dict["original_flow"] = json.dumps(mirror["original_flow"])
+        mirror_dict["mirror_flow"] = json.dumps(mirror["mirror_flow"])
         updated = self.db.mirrors.find_one_and_update(
             {"_id": mirror_id},
             {

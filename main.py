@@ -19,9 +19,8 @@ from .controllers import MongoController
 class Main(KytosNApp):
 
     def setup(self):
-        self.mirrors = {}
-        self.enabled_mirrors = []
         """
+        Traffic Mirror Napp. Each mirror data contains:
         mirrors = {
             "mirror_id1" : {
                 "name": "...",
@@ -34,6 +33,8 @@ class Main(KytosNApp):
             }
         }
         """
+        self.mirrors = {}
+        self.enabled_mirrors = []
         self.mongo_controller = self.get_mongo_controller()
         self.load_mirrors()
 
@@ -47,8 +48,8 @@ class Main(KytosNApp):
         return MongoController()
 
     def load_mirrors(self):
-        mirrors = self.mongo_controller.get_mirrors()
-        log.info("Loaded mirrors:", mirrors)
+        """Load mirrors from DB."""
+        self.mirrors = self.mongo_controller.get_mirrors()
 
     def validate_switch(self, switch):
         """Validates that the specified switch exists in the topology."""
@@ -117,7 +118,7 @@ class Main(KytosNApp):
                     raise HTTPException(400, f"Fail to create mirror flows. Return from flow_manager: {res.text}")
 
                 #ADD MIRROR TO MAIN/ACTIVE MIRROR LIST
-                mirror_id = uuid4().hex[:16]
+                mirror_id = uuid4().hex[:14]
 
                 self.mirrors[mirror_id] = {
                     "name": name,
@@ -131,6 +132,10 @@ class Main(KytosNApp):
                 }
 
                 self.enabled_mirrors.append(mirror_id)
+
+                self.mongo_controller.upsert_mirror(
+                    mirror_id, self.mirrors[mirror_id]
+                )
 
                 return JSONResponse(f"Mirror created: {mirror_id}")
 
@@ -184,7 +189,7 @@ class Main(KytosNApp):
                 log.info(f"create flows status={res.status_code} text={res.text}")
 
                 #ADD MIRROR TO MAIN/ACTIVEMIRROR LIST
-                mirror_id = uuid4().hex[:16]
+                mirror_id = uuid4().hex[:14]
 
                 self.mirrors[mirror_id] = {
                     "name": name,
@@ -198,6 +203,10 @@ class Main(KytosNApp):
                 }
 
                 self.enabled_mirrors.append(mirror_id)
+
+                self.mongo_controller.upsert_mirror(
+                    mirror_id, self.mirrors[mirror_id]
+                )
 
                 return JSONResponse(f"Mirror created: {mirror_id}")
             else:
@@ -229,7 +238,7 @@ class Main(KytosNApp):
     @rest('/v1/', methods=['GET'])
     def list_enabled_mirrors(self, request: Request) -> JSONResponse:
         """Returns a json with all the enabled mirrors."""
-        return JSONResponse(self.enabled_mirrors)
+        return JSONResponse({self.mirrors[id] for id in self.enabled_mirrors})
 
     @rest('/v1/all', methods=['GET'])
     def list_all_mirrors(self, request: Request) -> JSONResponse:
