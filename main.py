@@ -34,7 +34,6 @@ class Main(KytosNApp):
         }
         """
         self.mirrors = {}
-        self.enabled_mirrors = []
         self.mongo_controller = self.get_mongo_controller()
         self.load_mirrors()
 
