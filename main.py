@@ -233,9 +233,14 @@ class Main(KytosNApp):
     @rest('/v1/', methods=['GET'])
     def list_enabled_mirrors(self, request: Request) -> JSONResponse:
         """Returns a json with all the enabled mirrors."""
-        return JSONResponse(
-            {k: v for k, v in self.mirrors.items() if v["status"] == "Enabled"}
-        )
+        mirrors = {}
+        for mirror_id, mirror in self.mirrors.items():
+            if mirror["status"] != "Enabled":
+                continue
+            mirrors[mirror_id] = dict(mirror)
+            mirrors[mirror_id].pop("original_flow", None)
+            mirrors[mirror_id].pop("mirror_flow", None)
+        return JSONResponse(mirrors)
 
     @rest('/v1/all', methods=['GET'])
     def list_all_mirrors(self, request: Request) -> JSONResponse:
@@ -255,9 +260,11 @@ class Main(KytosNApp):
             if attr not in change_attrs:
                 raise HTTPException(400, f"Invalid parameter {attr}")
             cls = change_attrs[attr]
-            if not isinstance(attr, cls):
+            if not isinstance(command[attr], cls):
+                x = type(command[attr])
                 raise HTTPException(
-                    400, f"Invalid parameter type {attr} (expecting {cls})"
+                    400,
+                    f"Invalid parameter type {attr} (expecting {cls} was {x})"
                 )
 
         if "enabled" in command:
