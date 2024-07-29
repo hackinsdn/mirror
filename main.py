@@ -268,6 +268,7 @@ class Main(KytosNApp):
                 )
 
         if "enabled" in command:
+            status_request = command["enabled"]
             #DISABLE THE MIRROR BY REMOVING THE FLOW
             if self.mirrors[mirror_id]["type"] in ["EVC", "interface"]:
                 switch = self.mirrors[mirror_id]["switch"]
