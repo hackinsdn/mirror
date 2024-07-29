@@ -56,13 +56,14 @@ class MongoController:
     def upsert_mirror(self, mirror_id: str, mirror: Dict) -> Optional[Dict]:
         """Update or insert an EVC"""
         utc_now = datetime.utcnow()
-        mirror_dict = mirror | {"updated_at": utc_now}
+        mirror_dict = dict(mirror)
         mirror_dict["original_flow"] = json.dumps(mirror["original_flow"])
         mirror_dict["mirror_flow"] = json.dumps(mirror["mirror_flow"])
+        mirror_dict["updated_at"] = utc_now
         updated = self.db.mirrors.find_one_and_update(
             {"_id": mirror_id},
             {
-                "$set": mirror | {"updated_at": utc_now},
+                "$set": mirror_dict,
                 "$setOnInsert": {"inserted_at": utc_now},
             },
             return_document=ReturnDocument.AFTER,
