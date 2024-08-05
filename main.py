@@ -1,7 +1,7 @@
 """Main module of hackinsdn/mirror Kytos Napp."""
 
 from kytos.core import KytosNApp, log, rest
-from napps.optus.mirror import settings
+from napps.hackinsdn.mirror import settings
 from kytos.core.rest_api import (
     HTTPException,
     JSONResponse,
@@ -39,7 +39,6 @@ class Main(KytosNApp):
 
     def execute(self):
         """Do nothing."""
-        log.info("Mirror NApp running...")
 
     @staticmethod
     def get_mongo_controller():
@@ -228,8 +227,9 @@ class Main(KytosNApp):
         elif "match" in command:
             raise HTTPException(400, "Unsupported feature")
         else:
-            log.info("NApp optus/mirror invalid request")
-            raise HTTPException(400, "Invalid request")
+            msg = "must provide circuit_id, interface or match"
+            log.info(f"Invalid request: {msg} - request: {command}")
+            raise HTTPException(400, f"Invalid request: {msg}")
 
     @rest('/v1/', methods=['GET'])
     def list_enabled_mirrors(self, request: Request) -> JSONResponse:
@@ -306,4 +306,3 @@ class Main(KytosNApp):
 
     def shutdown(self):
         """Do nothing."""
-        log.info("NApp optus/mirror shutting down.")

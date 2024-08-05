@@ -1,1 +1,1 @@
-"""Module with the Constants used in the optus/mirror."""
+"""Module with the Constants used in the hackinsdn/mirror."""
