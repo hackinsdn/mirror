@@ -106,7 +106,8 @@ class Main(KytosNApp):
                             flow.pop(extraneous_key,None)
 
                         original_flow['flows'].append(copy.deepcopy(flow))
-                        flow["instructions"][0]["actions"].append({"action_type": "pop_vlan"})
+                        if flow["instructions"][0]["actions"][0] != {'action_type': 'pop_vlan'}:  # not an UNI
+                            flow["instructions"][0]["actions"].append({"action_type": "pop_vlan"})
                         flow["instructions"][0]["actions"].append({"action_type": "output", "port": target_port})
                         new_flow['flows'].append(flow)
 
